@@ -84,36 +84,54 @@ public class MyGame extends ApplicationAdapter {
     public void render() {
         float dt = Gdx.graphics.getDeltaTime();
         
-        // 1. Input Handling for Shooting
+        // 1. Input for shooting
         if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
             shootSphere();
         }
 
-        // 2. Update Logic
+        // 2. Update Trainer
         trainer.update(dt);
-        for (Monster m : monsters) {
-            m.update(dt);
-        }
-        
-        // Update active spheres and return inactive ones to the pool.
-        // We iterate BACKWARDS to safely remove items from the array while iterating.
+
+        // 3. Collision Detection and Sphere Management
         for (int i = activeSpheres.size - 1; i >= 0; i--) {
             CaptureSphere sphere = activeSpheres.get(i);
             sphere.update(dt);
             
-            if (!sphere.isActive()) {
+            boolean hit = false;
+            for (Monster m : monsters) {
+                // Only check collision with wandering monsters
+                if (m.getCurrentState() == Monster.State.WANDERING && 
+                    sphere.getBounds().overlaps(m.getBounds())) {
+                    
+                    m.capture(); // Change state to CAPTURED
+                    hit = true;
+                    break; // One sphere can only hit one monster
+                }
+            }
+
+            if (hit || !sphere.isActive()) {
                 activeSpheres.removeIndex(i);
-                spherePool.free(sphere); // Return object to the pool for future reuse
+                spherePool.free(sphere);
             }
         }
 
-        // 3. Clear Screen
+        // 4. Update Monsters with Follow-the-Leader Chain
+        GameObject currentLeader = trainer;
+        for (Monster m : monsters) {
+            if (m.getCurrentState() == Monster.State.CAPTURED) {
+                m.update(dt, currentLeader);
+                currentLeader = m; // The next captured monster follows this one
+            } else {
+                m.update(dt, null); // Wandering state
+            }
+        }
+
+        // 5. Render
         Gdx.gl.glClearColor(0.2f, 0.6f, 0.3f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        // 4. Render Phase
         batch.begin();
-        for (CaptureSphere s : activeSpheres) s.draw(batch); // Draw spheres below monsters
+        for (CaptureSphere s : activeSpheres) s.draw(batch);
         for (Monster m : monsters) m.draw(batch);
         trainer.draw(batch);
         batch.end();
