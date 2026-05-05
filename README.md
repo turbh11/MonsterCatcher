@@ -1,4 +1,46 @@
-# MonsterCatcher
+# Monster Catcher - 2D Java Game Study
+
+An interactive 2D game built with **Java** and the **libGDX** framework. This project serves as a comprehensive case study for applying software engineering principles, memory optimization, and game architecture.
+
+## 🚀 Key Features
+
+*   **Custom Game Engine Architecture:** Implemented a robust OOP hierarchy using a base `GameObject` class and specific entity inheritance.
+*   **Performance-Optimized Projectiles:** Leveraged **Object Pooling** for the `CaptureSphere` system to minimize Garbage Collection overhead and prevent frame-rate stutters.
+*   **AI State Machine:** Monsters feature a **Finite State Machine (FSM)** with `WANDERING` and `CAPTURED` states, including random-walk AI and boundary-aware navigation.
+*   **Follow-the-Leader Mechanics:** Captured monsters form a dynamic chain, utilizing vector math and distance-based steering to follow the player without stacking.
+*   **Elemental Logic:** Integrated an `ElementType` system (Fire, Water, Grass, Electric) with built-in advantage logic (e.g., Water beats Fire).
+
+## 🛠 Tech Stack
+
+*   **Language:** Java 17
+*   **Framework:** libGDX
+*   **Build Tool:** Gradle
+*   **Architecture:** Model-View-Controller (MVC) patterns and SOLID principles.
+
+## 📸 Screenshots
+
+| Player Movement & Monsters | Capturing Mechanics |
+| :---: | :---: |
+| ![Gameplay 1](screenshots/gameplay1.png) | ![Gameplay 2](screenshots/gameplay2.png) |
+| *Wandering AI in action* | *Capture chain following the trainer* |
+
+## 🧠 Technical Deep Dive
+
+### Object Pooling
+Instead of instantiating new objects on every click, the game retrieves spheres from a pre-allocated `Pool`. This is critical for mobile and desktop performance.
+```java
+// Example from the project
+CaptureSphere sphere = spherePool.obtain();
+sphere.init(originX, originY, direction);
+Collision Detection
+Uses AABB (Axis-Aligned Bounding Box) logic for efficient hit-testing between projectiles and monsters.
+
+⚙️ How to Run
+Clone the repository: git clone https://github.com/turbh11/MonsterCatcher.git
+
+Open the project in Eclipse or IntelliJ as a Gradle Project.
+
+Run the Lwjgl3Launcher.java file found in the lwjgl3 module.
 
 A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://github.com/libgdx/gdx-liftoff).
 
